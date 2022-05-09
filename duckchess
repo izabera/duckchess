@@ -108,9 +108,9 @@ while True:
                 # it's possible that two pawns in the same file are able to take an opponent's pawn
                 # e.g. a4 bxa3 (en passant) vs a4 bxa4 (normal capture)
                 enpassant = [ 2, 5 ]
-                if desty == enpassant[turn] and board[enpassant[turn]][destx] == ' ' and board[enpassant[turn]][destx] == 'Pp'[turn]:
-                    board[enpassant[turn] - (turn * 2 - 1)][destx] = ' '
-                    posy = enpassant[turn]
+                if desty == enpassant[turn] and board[enpassant[turn]][destx] == ' ' and board[enpassant[turn] - (turn * 2 - 1)][destx] == 'Pp'[turn]:
+                    posy = enpassant[turn] - (turn * 2 - 1)
+                    board[posy][destx] = ' '
                 else:
                     posy = desty - (turn * 2 - 1)
             else:
