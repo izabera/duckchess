@@ -65,7 +65,7 @@ while True:
             piece, disambiguation = piece[0], piece[1:]
             if disambiguation != '':
                 if disambiguation[-1].isdigit():
-                    disy = int(disambiguation[-1])
+                    disy = 8 - int(disambiguation[-1])
                 if disambiguation[0].isalpha():
                     disx = ord(disambiguation[0]) - ord('a')
             else:
