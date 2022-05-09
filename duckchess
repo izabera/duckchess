@@ -40,13 +40,6 @@ while True:
     move = input(players[turn] + '> ')
     standardmove, duckmove = move.split('@')
 
-    # remove duck first
-    for y in range(8):
-        for x in range(8):
-            if board[y][x] == '@':
-                board[y][x] = ' '
-                break
-
     # castling
     if standardmove == 'O-O-O':
         board[turn * 7][0] = ' '
@@ -124,6 +117,13 @@ while True:
         board[desty][destx] = board[posy][posx]
         board[posy][posx] = ' '
             
+    # finally, move the duck
+    for y in range(8):
+        for x in range(8):
+            if board[y][x] == '@':
+                board[y][x] = ' '
+                break
     board[8 - int(duckmove[1])][(ord(duckmove[0]) - ord('a'))] = '@'
+
     turn = (turn + 1) % 2
     draw()
