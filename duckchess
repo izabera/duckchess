@@ -116,7 +116,7 @@ while True:
             else:
                 posx = destx
                 double = [ 4, 3 ]
-                if desty == double[turn] and board[double[turn] - (turn * 2 - 1) * 2][destx] == 'pP'[turn] and board[double[turn] - (turn * 2 - 1)][destx] == ' ':
+                if desty == double[turn] and board[double[turn] - ((turn * 2 - 1) * 2)][destx] == 'pP'[turn] and board[double[turn] - (turn * 2 - 1)][destx] == ' ':
                     posy = double[turn] - (turn * 2 - 1) * 2
                 else:
                     posy = desty - (turn * 2 - 1)
