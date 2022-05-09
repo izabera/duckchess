@@ -1,0 +1,129 @@
+#!/usr/bin/python3
+
+def draw():
+    colour = 1
+    print('  a b c d e f g h')
+    for y in range(8):
+        print(8 - y, end = ' ')
+        colour = (colour + 1) % 2
+        for x in range(8):
+            colour = (colour + 1) % 2
+            bg = colour * 7 + 40
+            if board[y][x] == '@':
+                fg = 32
+            elif board[y][x].isupper():
+                fg = 31
+            else:
+                fg = 34
+            print(f'\x1b[{fg};{bg}m{board[y][x]}', end = ' ')
+        print(f'\x1b[m {8-y}')
+    print('  a b c d e f g h')
+
+
+board = [
+        [ 'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R' ],
+        [ 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P' ],
+        [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
+        [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
+        [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
+        [ ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
+        [ 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p' ],
+        [ 'r', 'n', 'b', 'q', 'k', 'b', 'n', 'r' ],
+        ]
+draw()
+
+players = [ 'white', 'black' ]
+turn = 0
+
+# assumes all the moves are valid
+while True:
+    move = input(players[turn] + '> ')
+    standardmove, duckmove = move.split('@')
+
+    # remove duck first
+    for y in range(8):
+        for x in range(8):
+            if board[y][x] == '@':
+                board[y][x] = ' '
+                break
+
+    # castling
+    if standardmove == 'O-O-O':
+        board[turn * 7][0] = ' '
+        board[turn * 7][3] = chr(ord('R') + turn * 32)
+        board[turn * 7][2] = chr(ord('K') + turn * 32)
+        board[turn * 7][4] = ' '
+
+    elif standardmove == 'O-O':
+        board[turn * 7][7] = ' '
+        board[turn * 7][5] = chr(ord('R') + turn * 32)
+        board[turn * 7][6] = chr(ord('K') + turn * 32)
+        board[turn * 7][4] = ' '
+
+    # any other move
+    else:
+        capture = 'x' in standardmove
+        piece, dest = standardmove[:-2 - capture], standardmove[-2::]
+        desty = 8 - int(dest[1])
+        destx = ord(dest[0]) - ord('a')
+
+        # find the only piece that can do this move
+        if standardmove[0] in 'BNRQK':
+            piece, disambiguation = piece[0], piece[1:]
+            if disambiguation != '':
+                if disambiguation[-1].isdigit():
+                    disy = int(disambiguation[-1])
+                if disambiguation[0].isalpha():
+                    disx = ord(disambiguation[0]) - ord('a')
+            else:
+                disy = ''
+                disx = ''
+
+            if piece == 'B':
+                offsets = [(i,i) for i in range(-7,8)] + [(i,-i) for i in range(-7,8)]
+            elif piece == 'N':
+                offsets = [(-1,-2), (-2, -1), (1,-2), (-2,1), (1,2), (2,1), (-1,2), (2,-1)]
+            elif piece == 'R':
+                offsets = [(i,0) for i in range(-7,8)] + [(0,i) for i in range(-7, 8)]
+            elif piece == 'Q':
+                offsets = [(i,0) for i in range(-7,8)] + [(0,i) for i in range(-7, 8)] + [(i,i) for i in range(-7,8)] + [(i,-i) for i in range(-7,8)]
+            else:
+                offsets = [(i,j) for i in range(-1,2) for j in range(-1,2)]
+
+            for y, x in offsets:
+                if y == 0 and x == 0:
+                    pass
+                y += desty
+                x += destx
+                if 0 <= y <= 7 and 0 <= x <= 7 and board[y][x] == [piece.lower(), piece][turn]:
+                    if (disy == '' or disy == y) and (disx == '' or disx == x):
+                        posy, posx = y, x
+                        break
+
+        else: # pawn move
+            # y - (turn * 2 - 1) == next rank if white, previous rank if black
+
+            if capture:
+                posx = ord(piece[0]) - ord('a')
+                # it's possible that two pawns in the same file are able to take an opponent's pawn
+                # e.g. a4 bxa3 (en passant) vs a4 bxa4 (normal capture)
+                enpassant = [ 2, 5 ]
+                if desty == enpassant[turn] and board[enpassant[turn]][destx] == ' ' and board[enpassant[turn]][destx] == 'Pp'[turn]:
+                    board[enpassant[turn] - (turn * 2 - 1)][destx] = ' '
+                    posy = enpassant[turn]
+                else:
+                    posy = desty - (turn * 2 - 1)
+            else:
+                posx = destx
+                double = [ 4, 3 ]
+                if desty == double[turn] and board[double[turn] - (turn * 2 - 1) * 2][destx] == 'pP'[turn] and board[double[turn] - (turn * 2 - 1)][destx] == ' ':
+                    posy = double[turn] - (turn * 2 - 1) * 2
+                else:
+                    posy = desty - (turn * 2 - 1)
+
+        board[desty][destx] = board[posy][posx]
+        board[posy][posx] = ' '
+            
+    board[8 - int(duckmove[1])][(ord(duckmove[0]) - ord('a'))] = '@'
+    turn = (turn + 1) % 2
+    draw()
