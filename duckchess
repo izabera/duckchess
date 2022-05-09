@@ -42,16 +42,16 @@ while True:
 
     # castling
     if standardmove == 'O-O-O':
-        board[turn * 7][0] = ' '
-        board[turn * 7][3] = chr(ord('R') + turn * 32)
-        board[turn * 7][2] = chr(ord('K') + turn * 32)
-        board[turn * 7][4] = ' '
+        board[(turn - 1) * -7][0] = ' '
+        board[(turn - 1) * -7][3] = chr(ord('R') - (turn - 1) * 32)
+        board[(turn - 1) * -7][2] = chr(ord('K') - (turn - 1) * 32)
+        board[(turn - 1) * -7][4] = ' '
 
     elif standardmove == 'O-O':
-        board[turn * 7][7] = ' '
-        board[turn * 7][5] = chr(ord('R') + turn * 32)
-        board[turn * 7][6] = chr(ord('K') + turn * 32)
-        board[turn * 7][4] = ' '
+        board[(turn - 1) * -7][7] = ' '
+        board[(turn - 1) * -7][5] = chr(ord('R') - (turn - 1) * 32)
+        board[(turn - 1) * -7][6] = chr(ord('K') - (turn - 1) * 32)
+        board[(turn - 1) * -7][4] = ' '
 
     # any other move
     else:
